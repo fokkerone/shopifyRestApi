@@ -1,4 +1,2 @@
-/app/config
+.DS_Store
 /app/tmp
-/plugins
-/vendors
