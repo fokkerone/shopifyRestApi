@@ -26,15 +26,6 @@ class ShopifyAppModel extends AppModel{
 	var $request = array();
 
 	 
-	/**
-	* The model's custom find types
-	* 
-	* @var array
-	*/
-	public $_findMethods = array(
-	'count' => true,
-	'other' => true,
-	);
 
 	/**
 	 * Overloads the Model::find() method. Resets request array in between calls

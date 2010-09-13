@@ -78,11 +78,16 @@ class Product extends ShopifyAppModel {
     ),
   );
 
+	/**
+	* The model's custom find types
+	* 
+	* @var array
+*/
 	var $_findMethods = array(
-	    'expand' => true,
-	    'clicks' => true,
-	    'recent' => true,
-
+	'expand' => true,
+	'clicks' => true,
+	'recent' => true,
+	'count'  => true,
 	);
  
 
