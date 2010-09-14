@@ -296,22 +296,7 @@ class ShopifySource extends DataSource
 	
 	//##########################################################   PRODUCTS    ##########################################################################################
 	
-	/**
-	* Receive a list of all Products
-	* Get all products of a given collection
-  * 
-	* Available URL Query parameters:
-  * 
-	* limit — Amount of results (default: 50) (maximum: 250)
-	* page — Page to show (default: 1)
-	* vendor — Filter by product vendor
-	* product_type — Filter by product type
-	* collection_id — Filter by collection id
-	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
-	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
-	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
-	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
-	**/
+
 	function getProducts($params){
 			return $this->__process($this->Http->get($this->__apicall( $url ), $params, $this->__getAuthHeader( ) ));	
 	}
@@ -334,26 +319,7 @@ class ShopifySource extends DataSource
 		return $this->__process($this->Http->get($this->__apicall( $url ), $params, $this->__getAuthHeader( ) ));	
 	}
 	
-	
-	/**
-	* Receive a count of all Products
-	* Get a count of all products of a given collection
-  * 
-	* Available URL Query parameters:
-  * 
-	* vendor — Filter by product vendor
-	* product_type — Filter by product type
-	* collection_id — Filter by collection id
-	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
-	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
-	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
-	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
-	* GET /admin/products/count.xml
-	* Count all products
-	**/
-	function countProducts( $params = array()){	
-		return  $this->__process( $this->Http->get( $this->__apicall('/admin/products/count.xml'), $params, $this->__getAuthHeader( ) ) );
-	}
+
 	
 	
 	/** 

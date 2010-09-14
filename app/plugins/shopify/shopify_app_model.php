@@ -40,15 +40,6 @@ class ShopifyAppModel extends AppModel{
 	  return parent::find($type, $options);
 	}
 	
-	/**
-	 * Overloads the Model::find() method. Resets request array in between calls
-	 * to Model::find()
-	 *
-	 * @param string $type
-	 * @param array $options
-	 * @return mixed
-	 */
-	
 
 	
 	

@@ -26,7 +26,7 @@ class ProductsController extends ShopifyAppController {
    * @access public
    */
   public function index() {
-    $products = $this->Product->find('count');
+    $products = $this->Product->find('list');
   #  $this->set(compact('products'));
 	debug ($products);
   }
@@ -49,23 +49,10 @@ class ProductsController extends ShopifyAppController {
   /**
    * Demo action for displaying the click information for a given Shopify hash
    */
-  public function view() {
-    
-    // If form submitted, redirect to same action with the form data in the url
-    if (!empty($this->data['Product'])) {
-      $this->redirect($this->data['Product']);
-    }
-
-    // If there is form data in the url, add it to Controller::data so it's
-    // repopulated in the form, and specify it in the conditions option when
-    // fetching the details from the web service.
-    if (!empty($this->passedArgs)) {
-      $this->data['Product'] = $this->passedArgs;
-      $product = $this->Product->find('clicks', array('conditions' => $this->passedArgs));
-      $this->set(compact('product'));
-    }
-
-  }
-  
+	public function view($id) {
+    	$product = $this->Product->find('id', array("id" => $id));
+		$this->set(compact('product'));
+		debug ($product);
+  }//end view
 }
 ?>
