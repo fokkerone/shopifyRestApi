@@ -26,7 +26,7 @@ class ProductsController extends ShopifyAppController {
    * @access public
    */
   public function index() {
-    $products = $this->Product->find('count');
+    $products = $this->Product->find('recent');
   #  $this->set(compact('products'));
 	debug ($products);
   }

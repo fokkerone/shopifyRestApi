@@ -82,7 +82,7 @@ class Product extends ShopifyAppModel {
 	* The model's custom find types
 	* 
 	* @var array
-*/
+	*/
 	var $_findMethods = array(
 	'expand' => true,
 	'clicks' => true,
@@ -98,14 +98,14 @@ class Product extends ShopifyAppModel {
    * @param array $results The results of the query
    * @return array The results of the query
    */
-  protected function _findExpand($state, $query = array(), $results = array()) {
-    if ($state == 'before') {
-      $this->_setCommonFindRequestParams('expand', $query);
-      return $query;
-    } else {
-      return $results;
-    }
-  }
+  	protected function _findExpand($state, $query = array(), $results = array()) {
+    	if ($state == 'before') {
+	      $this->_setCommonFindRequestParams('expand', $query);
+	      return $query;
+	    } else {
+	      return $results;
+	    }
+	}
 
   /**
    * Custom find type to clicks for a given hash or short url
