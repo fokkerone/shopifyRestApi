@@ -6,7 +6,7 @@ class ShopifyAppModel extends AppModel{
 	 *
 	 * @var string
 	 */
-	var $useDbConfig = 'shopify';
+	var $useDbConfig = 'Shopify.Shopify';
 
 	/**
 	 * The models in the plugin get data from the web service, so they don't need
@@ -25,7 +25,14 @@ class ShopifyAppModel extends AppModel{
 	 */
 	var $request = array();
 
+	var $datasource  = null;
 	 
+	
+	function __construct($config){
+
+		parent::__construct($config);
+		$this->datasource = ConnectionManager::getDataSource('shopify');
+	}
 
 	/**
 	 * Overloads the Model::find() method. Resets request array in between calls
@@ -40,29 +47,48 @@ class ShopifyAppModel extends AppModel{
 	  return parent::find($type, $options);
 	}
 	
-	/**
-	 * Overloads the Model::find() method. Resets request array in between calls
-	 * to Model::find()
-	 *
-	 * @param string $type
-	 * @param array $options
-	 * @return mixed
-	 */
-	
 
-	
+	/**
+	* Overwrites the Model::save
+	**/
+	public function save( $data = array() ) {
+		pr ("- Save method------");
+	  	debug ( $this->request);
+		$this->datasource->create($this);
+		debug ( $this->request);
+		$result = $this->connection->post($url, $xmlsrc, $request);
+	}
 	
 	/**
-	 * Returns ApiXML as DataArray
-	 *
-	 * @param string $result
-	 * @return mixed
-	 */
-	protected function renderAsXML( $results = Xml ){
-		 App::import('Core', 'Xml');
-	     $Xml = new Xml( $results );
-	     return $Xml->toArray();
+	* New Model::update
+	**/
+	public function update( $data = array() ){
+		$this->request = array();
+		ConnectionManager::getDataSource('shopify')->update($this);	  	
+	  	
+	}
+	
+	/**
+	* Overwrites the Model::delete
+	**/
+	public function delete( $data = array() ){
+		$this->request = array();
+		ConnectionManager::getDataSource('shopify')->delete($this);	  	  	
 	}
 
-}
+	
+	
+	/**
+	* Returns ApiXML as DataArray
+	*
+	* @param string $result
+	* @return mixed
+	*/
+	protected function renderAsXML( $results = Xml ){
+		App::import('Core', 'Xml');
+		$Xml = new Xml( $results );
+	   return $Xml->toArray();
+	}
+
+}//end Class
 ?>

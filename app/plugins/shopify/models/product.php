@@ -22,9 +22,7 @@ class Product extends ShopifyAppModel {
    * @var array
    */
   public $_schema = array(
-    'hash' => array('type' => 'string', 'length' => '6'),
-    'longUrl' => array('type' => 'text'),
-    'domain' => array('type' => 'string', 'length' => '20'),
+   
   );
 
   /**
@@ -40,42 +38,6 @@ class Product extends ShopifyAppModel {
    * @var array
    */
   public $validate = array(
-    'longUrl' => array(
-      'notEmpty' => array(
-        'rule' => 'notEmpty',
-        'message' => 'Please enter a long url',
-        'required' => true,
-        'allowEmpty' => false,
-        'on' => 'create',
-        'last' => true,
-      ),
-      'url' => array(
-        'rule' => 'url',
-        'message' => 'Please enter a valid long url',
-        'required' => true,
-        'allowEmpty' => false,
-        'on' => 'create',
-        'last' => true,
-      ),
-    ),
-    'domain' => array(
-      'notEmpty' => array(
-        'rule' => 'notEmpty',
-        'message' => 'Please select a preferred domain',
-        'required' => true,
-        'allowEmpty' => false,
-        'on' => 'create',
-        'last' => true,
-      ),
-      'inList' => array(
-        'rule' => array('inList', array('bit.ly', 'j.mp')),
-        'message' => 'Please select a valid domain',
-        'required' => true,
-        'allowEmpty' => false,
-        'on' => 'create',
-        'last' => true,
-      ),
-    ),
   );
 
 	/**
@@ -84,115 +46,150 @@ class Product extends ShopifyAppModel {
 	* @var array
 	*/
 	var $_findMethods = array(
-	'expand' => true,
-	'clicks' => true,
-	'recent' => true,
-	'count'  => true,
+	'getproducts' => true,
+	'getproduct' => true,
+	'getproductcount'  => true,
 	);
- 
 
-  /**
-   * Custom find type to expand a given short url
-   * @param string $state "before" or "after"
-   * @param array $query Can include conditions for hash or shortUrl
-   * @param array $results The results of the query
-   * @return array The results of the query
-   */
-  	protected function _findExpand($state, $query = array(), $results = array()) {
-    	if ($state == 'before') {
-	      $this->_setCommonFindRequestParams('expand', $query);
-	      return $query;
-	    } else {
-	      return $results;
-	    }
-	}
 
-  /**
-   * Custom find type to clicks for a given hash or short url
-   *
-   * @param string $state
-   * @param array $query
-   * @param array $results
-   * @return array
-   */
-  protected function _findClicks($state, $query = array(), $results = array()) {
-    if ($state == 'before') {
-      if (isset($query['conditions']['hash'])) {
-        $this->request['uri']['query']['hash'] = $query['conditions']['hash'];
-      } elseif ($query['conditions']['shortUrl']) {
-        $this->request['uri']['query']['shortUrl'] = $query['conditions']['shortUrl'];
-      } else {
-        return false;
-      }
-      $this->request['uri']['path'] = '/v3/clicks';
-      return $query;
-    } else {
-      return $results;
+	/**
+	* Receive a count of all Products
+	* Get a count of all products of a given collection
+ 	* 
+	* Available URL Query parameters:
+ 	* 
+	* vendor — Filter by product vendor
+	* product_type — Filter by product type
+	* collection_id — Filter by collection id
+	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
+	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
+	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
+	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
+	* GET /admin/products/count.xml
+	* Count all products
+	**/
+	public function _findGetproductcount($state, $query = array(), $results = array()) {
+		if ($state == 'before') {   
+			$this->request['uri']['path'] = '/admin/products/count.xml';
+      	return $query;
+		} else {
+			return $this->renderAsXML( $results );
     }
   }
+  
 
-
-
-  public function _findCount($state, $query = array(), $results = array()) {
-	pr("dsfsdf");
-  }
-
-  /**
-   * Custom find type to fetch recent links from user's Shopify recent links rss
-   * feed
-   * 
-   * @param string $state "before" or "after"
-   * @param array $query
-   * @param array $results
-   * @return array
-   */
-  protected function _findRecent($state, $query = array(), $results = array()) {
+  	/**
+	* Receive a list of all Products
+	* Get all products of a given collection
+  * 
+	* Available URL Query parameters:
+  * 
+	* limit — Amount of results (default: 50) (maximum: 250)
+	* page — Page to show (default: 1)
+	* vendor — Filter by product vendor
+	* product_type — Filter by product type
+	* collection_id — Filter by collection id
+	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
+	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
+	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
+	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
+	**/
+  public function _findGetproduct($state, $query = array(), $results = array()) {
 	if ($state == 'before') {   
 		$this->request['uri']['path'] = '/admin/products.xml';
-      	return $query;
+      return $query;
 	} else {
 		return $this->renderAsXML( $results );
     }
   }
 
-  /**
-   * Overrides Model::save() as that just returns boolean - we need to return
-   * the full response from bit.ly after creating a short url.
-   */
-  public function save($data = null, $validate = true, $fieldList = array()) {
 
-    $this->request = array(
-      'method' => 'GET',
-      'uri' => array(
-        'path' => 'v3/shorten',
-        'query' => array(
-          'longUrl' => $data['---------']['longUrl'],
-        ),
-      ),
-    );
+	public function _findGetproducts($state, $query = array(), $results = array()) {
+		if ($state == 'before') { 
+		 
+			$url = "/admin/products";
+			if( isset ($query['id']) ) {
+				$id = $query['id'] ;
+				$url .= "/{$id}.xml";
+			} else {
+				$url .= ".xml";
+			}
+			
+				$this->request['uri']['path'] = $url;
+				return $query;
+		} else {
+	 		return $this->renderAsXML( $results );
+		}
+  }//find Product ID
 
-    if (isset($data['Product']['domain'])) {
-      $this->request['uri']['query']['domain'] = $data['Product']['domain'];
-    }
-
-    if (isset($data['Product']['x_login'])) {
-      $this->request['uri']['query']['x_login'] = $data['Product']['x_login'];
-    }
-
-    if (isset($data['Product']['x_apiKey'])) {
-      $this->request['uri']['query']['x_apiKey'] = $data['Product']['x_apiKey'];
-    }
-
-    $result = parent::save($data, $validate, $fieldList);
-
-    if ($result) {
-      $result = $this->response;
-    }
-
-    return $result;
-    
-  }
-
+	/** 
+	* Create a new Product
+	* Create a new product
+   * 
+	* POST: /admin/products.xml
+	* Create a new product with multiple product variants
+	* 
+	* 
+	* REQUEST:
+	* <?xml version="1.0" encoding="UTF-8"?>
+	* <product>
+	*   <product-type>Snowboard</product-type>
+	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
+	*   <title>Burton Custom Freestlye 151</title>
+	*   <variants type="array">
+	*     <variant>
+	*       <option1>First</option1>
+	*       <price>10.00</price>
+	*     </variant>
+	*     <variant>
+	*       <option1>Second</option1>
+	*       <price>20.00</price>
+	*     </variant>
+	*   </variants>
+	*   <vendor>Burton</vendor>
+	* </product>
+  	* 
+	* POST: /admin/products.xml
+  	* Create a new product with the default product variant
+  	* 
+  	* REQUEST:
+  	* <?xml version="1.0" encoding="UTF-8"?>
+  	* <product>
+  	*   <product-type>Snowboard</product-type>
+  	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
+  	*   <title>Burton Custom Freestlye 151</title>
+  	*   <tags>Barnes &amp; Noble, John's Fav, "Big Air"</tags>
+  	*   <vendor>Burton</vendor>
+  	* </product>
+	*
+	*
+	* Create a new product with the default variant and base64 encoded image
+   * 
+   * 
+	* <?xml version="1.0" encoding="UTF-8"?>
+	* <product>
+	*   <product-type>Snowboard</product-type>
+	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
+	*   <title>Burton Custom Freestlye 151</title>
+	*   <images type="array">
+	*     <image>
+	*       <attachment>R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==
+	* </attachment>
+	*     </image>
+	*   </images>
+	*   <vendor>Burton</vendor>
+	* </product>
+   * 
+   * 
+	**/	
+	function createProduct( $data = null, $validate = true, $fieldList = array() ){
+		debug ('createProduct');
+		$this->request['uri']['path'] = '/admin/products.xml';	 
+	   $response = $this->save( $data );
+		debug ($response);
+		return $response;
+	}
+	
 }//end Class
 
 ?>

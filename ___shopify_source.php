@@ -296,22 +296,7 @@ class ShopifySource extends DataSource
 	
 	//##########################################################   PRODUCTS    ##########################################################################################
 	
-	/**
-	* Receive a list of all Products
-	* Get all products of a given collection
-  * 
-	* Available URL Query parameters:
-  * 
-	* limit — Amount of results (default: 50) (maximum: 250)
-	* page — Page to show (default: 1)
-	* vendor — Filter by product vendor
-	* product_type — Filter by product type
-	* collection_id — Filter by collection id
-	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
-	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
-	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
-	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
-	**/
+
 	function getProducts($params){
 			return $this->__process($this->Http->get($this->__apicall( $url ), $params, $this->__getAuthHeader( ) ));	
 	}
@@ -334,109 +319,10 @@ class ShopifySource extends DataSource
 		return $this->__process($this->Http->get($this->__apicall( $url ), $params, $this->__getAuthHeader( ) ));	
 	}
 	
-	
-	/**
-	* Receive a count of all Products
-	* Get a count of all products of a given collection
-  * 
-	* Available URL Query parameters:
-  * 
-	* vendor — Filter by product vendor
-	* product_type — Filter by product type
-	* collection_id — Filter by collection id
-	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
-	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
-	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
-	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
-	* GET /admin/products/count.xml
-	* Count all products
-	**/
-	function countProducts( $params = array()){	
-		return  $this->__process( $this->Http->get( $this->__apicall('/admin/products/count.xml'), $params, $this->__getAuthHeader( ) ) );
-	}
+
 	
 	
-	/** 
-	* Create a new Product
-	* Create a new product
-    * 
-	* POST: /admin/products.xml
-	* Create a new product with multiple product variants
-	* 
-	* 
-	* REQUEST:
-	* <?xml version="1.0" encoding="UTF-8"?>
-	* <product>
-	*   <product-type>Snowboard</product-type>
-	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-	*   <title>Burton Custom Freestlye 151</title>
-	*   <variants type="array">
-	*     <variant>
-	*       <option1>First</option1>
-	*       <price>10.00</price>
-	*     </variant>
-	*     <variant>
-	*       <option1>Second</option1>
-	*       <price>20.00</price>
-	*     </variant>
-	*   </variants>
-	*   <vendor>Burton</vendor>
-	* </product>
-   	* 
-	* POST: /admin/products.xml
-   	* Create a new product with the default product variant
-   	* 
-   	* REQUEST:
-   	* <?xml version="1.0" encoding="UTF-8"?>
-   	* <product>
-   	*   <product-type>Snowboard</product-type>
-   	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-   	*   <title>Burton Custom Freestlye 151</title>
-   	*   <tags>Barnes &amp; Noble, John's Fav, "Big Air"</tags>
-   	*   <vendor>Burton</vendor>
-   	* </product>
-	*
-	*
-	* Create a new product with the default variant and base64 encoded image
-    * 
-	* Request
-    * 
-    * 
-	* <?xml version="1.0" encoding="UTF-8"?>
-	* <product>
-	*   <product-type>Snowboard</product-type>
-	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-	*   <title>Burton Custom Freestlye 151</title>
-	*   <images type="array">
-	*     <image>
-	*       <attachment>R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==
-	* </attachment>
-	*     </image>
-	*   </images>
-	*   <vendor>Burton</vendor>
-	* </product>
-    * 
-    * 
-	**/	
-	function createProduct( $request = false){
-		//if(!$request) return false;
-		
-		$request = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>
-		<product>
-		  <product-type>Snowboard</product-type>
-		  <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-		  <title>Burton Custom Freestlye 151</title>
-		  <vendor>Burton</vendor>
-		</product>';
-		
-		
-// $input = '<' . '?xml version="1.0" encoding="UTF-8" ?' . '>    <container>        <element id="first-el">            <name>My element</name>            <size>20</size>        </element>        <element>            <name>Your element</name>            <size>30</size>        </element>    </container>';
-	//	$fields = new XML($input);
-	//	$fields = array('product' => $request);
 	
-		return  $this->__process( $this->Http->post( $this->__apicall('/admin/products.xml'), $request, $this->__getAuthHeader( "POST" ) ) );
-		
-	}
 	
 	
 	/**
