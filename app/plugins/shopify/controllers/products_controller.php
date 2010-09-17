@@ -26,7 +26,7 @@ class ProductsController extends ShopifyAppController {
    * @access public
    */
   public function index() {
-    $products = $this->Product->find('list');
+    $products = $this->Product->find('getproducts');
   #  $this->set(compact('products'));
 	debug ($products);
   }
@@ -38,21 +38,38 @@ class ProductsController extends ShopifyAppController {
    * @access public
    */
   public function add() {
-    
-    if (!empty($this->data)) {
-      $product = $this->Product->save($this->data);
-      $this->set(compact('product	'));
-    }
-
+		$xmlsrc = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>
+				<product>
+				    <title>pornoStocjer</title>
+				    <body>This is the description.</body>
+				    <product-type>Photoshop</product-type>
+				    <variants type="array">
+				        <variant>
+				            <price>99898.00</price>
+				            <option1>Single-Use</option1>
+				        </variant>
+				        <variant>
+				            <price>9898.00</price>
+				            <option1>Buyout</option1>
+				        </variant>
+				    </variants>
+				    <vendor>fokkerone</vendor>
+				</product>';
+   	$products = $this->Product->createProduct( $xmlsrc );
   }
 
   /**
    * Demo action for displaying the click information for a given Shopify hash
    */
 	public function view($id) {
-    	$product = $this->Product->find('id', array("id" => $id));
+    	$product = $this->Product->find('getproduct', array("id" => $id));
 		$this->set(compact('product'));
 		debug ($product);
   }//end view
-}
-?>
+
+	public function makemehappy(){
+		$this->Product->createProduct();
+	//	debug ($this->Product->makemehappy());
+		
+	}
+}?>

@@ -96,18 +96,19 @@ class Product extends ShopifyAppModel {
   public function _findGetproduct($state, $query = array(), $results = array()) {
 	if ($state == 'before') {   
 		$this->request['uri']['path'] = '/admin/products.xml';
-      	return $query;
+      return $query;
 	} else {
 		return $this->renderAsXML( $results );
     }
   }
 
 
-	public function _findGetproduct($state, $query = array(), $results = array()) {
+	public function _findGetproducts($state, $query = array(), $results = array()) {
 		if ($state == 'before') { 
-		 	$id = $query['id'];
+		 
 			$url = "/admin/products";
-			if($id) {
+			if( isset ($query['id']) ) {
+				$id = $query['id'] ;
 				$url .= "/{$id}.xml";
 			} else {
 				$url .= ".xml";
@@ -120,44 +121,74 @@ class Product extends ShopifyAppModel {
 		}
   }//find Product ID
 
-  /**
-   * Overrides Model::save() as that just returns boolean - we need to return
-   * the full response from bit.ly after creating a short url.
-   */
-  public function save($data = null, $validate = true, $fieldList = array()) {
-
-    $this->request = array(
-      'method' => 'GET',
-      'uri' => array(
-        'path' => 'v3/shorten',
-        'query' => array(
-          'longUrl' => $data['---------']['longUrl'],
-        ),
-      ),
-    );
-
-    if (isset($data['Product']['domain'])) {
-      $this->request['uri']['query']['domain'] = $data['Product']['domain'];
-    }
-
-    if (isset($data['Product']['x_login'])) {
-      $this->request['uri']['query']['x_login'] = $data['Product']['x_login'];
-    }
-
-    if (isset($data['Product']['x_apiKey'])) {
-      $this->request['uri']['query']['x_apiKey'] = $data['Product']['x_apiKey'];
-    }
-
-    $result = parent::save($data, $validate, $fieldList);
-
-    if ($result) {
-      $result = $this->response;
-    }
-
-    return $result;
-    
-  }
-
+	/** 
+	* Create a new Product
+	* Create a new product
+   * 
+	* POST: /admin/products.xml
+	* Create a new product with multiple product variants
+	* 
+	* 
+	* REQUEST:
+	* <?xml version="1.0" encoding="UTF-8"?>
+	* <product>
+	*   <product-type>Snowboard</product-type>
+	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
+	*   <title>Burton Custom Freestlye 151</title>
+	*   <variants type="array">
+	*     <variant>
+	*       <option1>First</option1>
+	*       <price>10.00</price>
+	*     </variant>
+	*     <variant>
+	*       <option1>Second</option1>
+	*       <price>20.00</price>
+	*     </variant>
+	*   </variants>
+	*   <vendor>Burton</vendor>
+	* </product>
+  	* 
+	* POST: /admin/products.xml
+  	* Create a new product with the default product variant
+  	* 
+  	* REQUEST:
+  	* <?xml version="1.0" encoding="UTF-8"?>
+  	* <product>
+  	*   <product-type>Snowboard</product-type>
+  	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
+  	*   <title>Burton Custom Freestlye 151</title>
+  	*   <tags>Barnes &amp; Noble, John's Fav, "Big Air"</tags>
+  	*   <vendor>Burton</vendor>
+  	* </product>
+	*
+	*
+	* Create a new product with the default variant and base64 encoded image
+   * 
+   * 
+	* <?xml version="1.0" encoding="UTF-8"?>
+	* <product>
+	*   <product-type>Snowboard</product-type>
+	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
+	*   <title>Burton Custom Freestlye 151</title>
+	*   <images type="array">
+	*     <image>
+	*       <attachment>R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==
+	* </attachment>
+	*     </image>
+	*   </images>
+	*   <vendor>Burton</vendor>
+	* </product>
+   * 
+   * 
+	**/	
+	function createProduct( $data = null, $validate = true, $fieldList = array() ){
+		debug ('createProduct');
+		$this->request['uri']['path'] = '/admin/products.xml';	 
+	   $response = $this->save( $data );
+		debug ($response);
+		return $response;
+	}
+	
 }//end Class
 
 ?>
