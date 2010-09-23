@@ -94,7 +94,7 @@ class DATABASE_CONFIG {
 	);
 	
 	var $shopify = array( 
-	        'datasource' => 'Shopify.ShopifySource', 
+	        'datasource' 	=> 'Shopify.ShopifySource', 
 	        'apiKey' 		=> 'a1fd0d6322e0d665ebf5192bb376f265',			// api_key 
 	        'login' 		=> 'b736601fe213be781403139ef4a31be4', 
 			'host'			=> 'dcalz.myshopify.com',
@@ -102,16 +102,6 @@ class DATABASE_CONFIG {
 
 			// http://apikey:password@hostname/admin/resource.xml
 			// sample url http://a1fd0d6322e0d665ebf5192bb376f265:b736601fe213be781403139ef4a31be4@dcalz.myshopify.com/admin/orders.xml
-	    );
-	
-	var $shopifie = array( 
-		      'datasource' 	=> 'ShopifySource', 
-		      'apiKey' 		=> 'a1fd0d6322e0d665ebf5192bb376f265',			// api_key 
-		      'login' 			=> 'b736601fe213be781403139ef4a31be4', 
-				'host'			=> 'dcalz.myshopify.com',
-				'private'		=> null,
+	 );
 
-				// http://apikey:password@hostname/admin/resource.xml
-				// sample url http://a1fd0d6322e0d665ebf5192bb376f265:b736601fe213be781403139ef4a31be4@dcalz.myshopify.com/admin/orders.xml
-	);
 }

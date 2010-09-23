@@ -14,16 +14,14 @@ class Product extends ShopifyAppModel {
    * 
    * @var string
    */
-  public $name ='Product';
+  	public $name ='Product';
 
   /**
    * Model schema
    * 
    * @var array
    */
-  public $_schema = array(
-   
-  );
+ 	public $_schema = array();
 
   /**
    * Model primary key
@@ -81,9 +79,9 @@ class Product extends ShopifyAppModel {
   	/**
 	* Receive a list of all Products
 	* Get all products of a given collection
-  * 
+  	* 
 	* Available URL Query parameters:
-  * 
+  	* 
 	* limit — Amount of results (default: 50) (maximum: 250)
 	* page — Page to show (default: 1)
 	* vendor — Filter by product vendor
@@ -94,12 +92,12 @@ class Product extends ShopifyAppModel {
 	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
 	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
 	**/
-  public function _findGetproduct($state, $query = array(), $results = array()) {
-	if ($state == 'before') {   
-		$this->request['uri']['path'] = '/admin/products.xml';
-      return $query;
-	} else {
-		return $this->renderAsXML( $results );
+	public function _findGetproduct($state, $query = array(), $results = array()) {
+		if ($state == 'before') {   
+			$this->request['uri']['path'] = '/admin/products.xml';
+      		return $query;
+		} else {
+			return $this->renderAsXML( $results );
     }
   }
 
@@ -120,74 +118,28 @@ class Product extends ShopifyAppModel {
 		} else {
 	 		return $this->renderAsXML( $results );
 		}
-  }//find Product ID
+  	}//find Product ID
 
 	/** 
 	* Create a new Product
 	* Create a new product
-   * 
+   	* 
 	* POST: /admin/products.xml
-	* Create a new product with multiple product variants
-	* 
-	* 
-	* REQUEST:
-	* <?xml version="1.0" encoding="UTF-8"?>
-	* <product>
-	*   <product-type>Snowboard</product-type>
-	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-	*   <title>Burton Custom Freestlye 151</title>
-	*   <variants type="array">
-	*     <variant>
-	*       <option1>First</option1>
-	*       <price>10.00</price>
-	*     </variant>
-	*     <variant>
-	*       <option1>Second</option1>
-	*       <price>20.00</price>
-	*     </variant>
-	*   </variants>
-	*   <vendor>Burton</vendor>
-	* </product>
-  	* 
-	* POST: /admin/products.xml
-  	* Create a new product with the default product variant
-  	* 
-  	* REQUEST:
-  	* <?xml version="1.0" encoding="UTF-8"?>
-  	* <product>
-  	*   <product-type>Snowboard</product-type>
-  	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-  	*   <title>Burton Custom Freestlye 151</title>
-  	*   <tags>Barnes &amp; Noble, John's Fav, "Big Air"</tags>
-  	*   <vendor>Burton</vendor>
-  	* </product>
-	*
-	*
-	* Create a new product with the default variant and base64 encoded image
-   * 
-   * 
-	* <?xml version="1.0" encoding="UTF-8"?>
-	* <product>
-	*   <product-type>Snowboard</product-type>
-	*   <body-html>&lt;strong&gt;Good snowboard!&lt;/strong&gt;</body-html>
-	*   <title>Burton Custom Freestlye 151</title>
-	*   <images type="array">
-	*     <image>
-	*       <attachment>R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==
-	* </attachment>
-	*     </image>
-	*   </images>
-	*   <vendor>Burton</vendor>
-	* </product>
-   * 
-   * 
 	**/	
 	function createProduct( $data = null, $validate = true, $fieldList = array() ){
-		debug ('createProduct');
-		$this->request['uri']['path'] = '/admin/products.xml';	 
-	   $response = $this->save( $data );
+		$this->data = $data;
+	   	$response = $this->save( '/admin/products.xml', $data );
 		debug ($response);
-		return $response;
+		return $response;		
+	}
+	
+	
+	function deleteProduct( $id ){
+
+		$this->id = $id;
+	   	$response = $this->delete( "/admin/products/{$id}.xml" );
+		debug ($response);
+		return $response;		
 	}
 	
 }//end Class

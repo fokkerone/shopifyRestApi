@@ -26,9 +26,8 @@ class ProductsController extends ShopifyAppController {
    * @access public
    */
   public function index() {
-
     $products = $this->Product->find('getproducts');
- #  $this->set(compact('products'));
+ 	$this->set(compact('products'));
 	debug ($products);
   }
 
@@ -41,7 +40,7 @@ class ProductsController extends ShopifyAppController {
   public function add() {
 		$xmlsrc = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>
 				<product>
-				    <title>pornoStocjer</title>
+				    <title>pickelBacke</title>
 				    <body>This is the description.</body>
 				    <product-type>Photoshop</product-type>
 				    <variants type="array">
@@ -65,9 +64,11 @@ class ProductsController extends ShopifyAppController {
 	public function view($id) {
     	$product = $this->Product->find('getproduct', array("id" => $id));
 		$this->set(compact('product'));
-		debug ($product);
-  }//end view
+	}
 
+	public function delete( $id ){
+		$product = $this->Product->deleteProduct( $id );	
+	}
 	public function makemehappy(){
 		$this->Product->createProduct();
 	//	debug ($this->Product->makemehappy());

@@ -40,19 +40,20 @@ class ShopifySource extends DataSource {
     $this->Http = $Http;
   }
 
-  /**
-   * Sets method = POST in request if not already set
-   *
-   * @param AppModel $model
-   * @param array $fields Unused
-   * @param array $values Unused
-   */
-  public function create(&$model, $fields = null, $values = null) {
-		debug("-C R E A T E-");
-    	$model->request = array_merge(array('method' => 'POST'), $model->request);
-		$model->request['header']['Content-Type'] = "application/xml";	
-    	return $this->request($model);
-  }
+  	/**
+   	* Sets method = POST in request if not already set
+   	*
+   	* @param AppModel $model
+   	* @param array $fields Unused
+   	* @param array $values Unused
+   	*/
+	public function create( &$model, $path ) {
+		
+		$model->request['method'] = 'POST';
+		$model->request['header']['Content-Type'] 	= "application/xml";	
+		
+	 	return $this->apiCall( $model, $path );
+	}
 
   /**
    * Sets method = GET in request if not already set
@@ -86,11 +87,24 @@ class ShopifySource extends DataSource {
    * @param AppModel $model
    * @param mixed $id Unused
    */
-  public function delete(&$model, $id = null) {
-	debug ("delete");
-   $model->request = array_merge(array('method' => 'DELETE'), $model->request);
-   return $this->request($model);
-  }
+	public function delete(&$model, $path) {
+
+		
+		$model->request['method'] = 'DELETE';
+		
+		$this->getRequestHost( $model );
+		$this->	getAuth( $model );
+	  
+
+		$model->request['header']['Content-Type'] 	= "application/xml";
+		$model->request['uri']['path'] 				= $path;	 
+		
+		$url = "http://" . 	$model->request['uri']['host'] . $path;
+		debug ( $url );
+		$result = $this->Http->request( $model->request );
+		
+		return $result;
+  	}
 
 	// public function please_build_Request_Url(){
 	// 		return $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];
@@ -108,43 +122,41 @@ class ShopifySource extends DataSource {
    */
   public function request(&$model) {
 	
-	 if (!isset($model->request['uri']['host'])) {
-
+	if (!isset($model->request['uri']['host'])) {
 		$model->request['uri']['host'] = $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];
     }
 
     if (!isset($model->request['uri']['query']['login'])) {
-      $model->request['uri']['query']['login'] = $this->config['login'];
+		$model->request['uri']['query']['login'] = $this->config['login'];
     }
 
     if (!isset($model->request['uri']['query']['apiKey'])) {
-      $model->request['uri']['query']['apiKey'] = $this->config['apiKey'];
+		$model->request['uri']['query']['apiKey'] = $this->config['apiKey'];
     }
 
-
     if (is_object($model)) {
-      $request = $model->request;
+		$request = $model->request;
     } elseif (is_array($model)) {
-      $request = $model;
+		$request = $model;
     } elseif (is_string($model)) {
-      $request = array('uri' => $model);
+		$request = array('uri' => $model);
     }
 
     // Remove unwanted elements from request array
     $request = array_intersect_key($request, $this->Http->request);
 
     // Issues request
-    $response = $this->Http->request($request);
-
+	$response = $this->Http->request($request);
+	
+	
     // Get content type header
     $contentType = $this->Http->response['header']['Content-Type'];
-
+   
     // Extract content type from content type header
     if (preg_match('/^([a-z0-9\/\+]+);\s*charset=([a-z0-9\-]+)/i', $contentType, $matches)) {
       $contentType = $matches[1];
       $charset = $matches[2];
     }
-
     // Decode response according to content type
     switch ($contentType) {
     	case 'application/xml':
@@ -156,7 +168,7 @@ class ShopifySource extends DataSource {
         // Xml class. This can use a lot of memory so we have to manually
         // garbage collect the Xml object when we've finished with it, i.e. got
         // it to transform the xml string response into a php array.
-    	  App::import('Core', 'Xml');
+		App::import('Core', 'Xml');
       	$Xml = new Xml($response);
       	$response = $Xml->toArray(false); // Send false to get separate elements
         $Xml->__destruct();
@@ -184,5 +196,40 @@ class ShopifySource extends DataSource {
     return $response;
   }
 
+
+	/** 
+	* PRIVATE fucntions
+	**/
+	private function getRequestHost( &$model ){
+		$model->request['uri']['host'] = $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];	
+	}
+	
+	private function getAuth( &$model ){
+		$model->request['uri']['query']['login'] 	= $this->config['login'];
+	    $model->request['uri']['query']['apiKey'] 	= $this->config['apiKey'];
+	}
+	
+	private function renderXml2Array( $response ) {
+		App::import('Core', 'Xml');
+      	$Xml = new Xml($response);
+      	$response = $Xml->toArray(false); // Send false to get separate elements
+        $Xml->__destruct();
+        $Xml = null;
+        unset($Xml);
+		return $response;
+	}
+	
+	private function apiCall( &$model, $path ){
+	
+		$this->getRequestHost( $model );
+		$this->getAuth( $model );
+		$model->request['uri']['path'] 	= $path;
+		
+		$url 							= "http://" . 	$model->request['uri']['host'] . $path;
+		
+		$response =  $this->Http->post($url, $model->data, $model->request );
+			pr( $this->Http->request );
+		return $this->renderXml2Array( $response );
+	}
 }//end Class
 ?>
