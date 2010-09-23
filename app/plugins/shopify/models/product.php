@@ -129,10 +129,9 @@ class Product extends ShopifyAppModel {
 	}
 	
 	
-	function deleteProduct( $id ){
-
-		$this->id = $id;
-	   	$response = $this->delete( "/admin/products/{$id}.xml" );
+	function delete( $id ){
+		
+	   	$response = parent::delete( "/admin/products/{$id}.xml" );
 		debug ($response);
 		return $response;		
 	}

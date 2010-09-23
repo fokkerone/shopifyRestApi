@@ -52,7 +52,7 @@ class AssetsController extends ShopifyAppController {
 	
 
 	public function delete( $id ){
-		$product = $this->Product->deleteProduct( $id );	
+		$product = $this->Product->delete( $id );	
 	}
 
 }

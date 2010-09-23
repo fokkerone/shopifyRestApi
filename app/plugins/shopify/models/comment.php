@@ -137,7 +137,7 @@ class Comment extends ShopifyAppModel {
 	}
 	
 	
-	function deleteProduct( $id ){
+	function delete( $id ){
 
 		$this->id = $id;
 	   	$response = $this->delete( "/admin/products/{$id}.xml" );
