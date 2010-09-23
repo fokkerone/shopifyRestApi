@@ -6,15 +6,16 @@
  * @link http://www.addesivo.com
  * @copyright (c) 2010 fokkerone
  * @license MIT License - http://www.opensource.org/licenses/mit-license.php
+* @todo: ALLES
  */
-class Product extends ShopifyAppModel {
+class Page extends ShopifyAppModel {
 
   /**
    * Name of the model
    * 
    * @var string
    */
-  	public $name ='Product';
+  	public $name ='Page';
 
   /**
    * Model schema
@@ -68,7 +69,7 @@ class Product extends ShopifyAppModel {
 	public function _findCount($state, $query = array(), $results = array()) {
 		if ($state == 'before') {   
 			$this->setQueryParams( $query );
-			$this->request['uri']['path'] = '/admin/products/count.xml';
+			$this->request['uri']['path'] = '/admin/orders/#{id}/pages.xml?limit=1&page=2';
       	return $query;
 		} else {
 			return $this->renderAsXML( $results );

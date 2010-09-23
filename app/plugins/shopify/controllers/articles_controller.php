@@ -8,7 +8,7 @@
  * @copyright (c) 2010 fokkerone
  * @license MIT License - http://www.opensource.org/licenses/mit-license.php
  */
-class ProductsController extends ShopifyAppController {
+class ArticlesController extends ShopifyAppController {
 
   /**
    * The name of this controller
@@ -16,7 +16,7 @@ class ProductsController extends ShopifyAppController {
    * @var string
    * @access public
    */
-	public $name = 'Products';
+	public $name = 'Articles';
 
   /**
    * Demo action for showing the most recent Shopify links from your account. Note
@@ -25,11 +25,11 @@ class ProductsController extends ShopifyAppController {
    * @return void
    * @access public
    */
-  public function index() {
-	 debug ($this->Product->find('count', array("vendor" => "fokkerone")));
-    $products = $this->Product->find('list');
- 	$this->set(compact('products'));
-	debug ($products);
+	public function index() {
+	 	debug ($this->Article->find('count', array("vendor" => "fokkerone")));
+    	$articles = $this->Article->find('list');
+ 		$this->set(compact('$articles'));
+		debug ($articles);
   }
 
   /**
@@ -38,32 +38,15 @@ class ProductsController extends ShopifyAppController {
    * @return void
    * @access public
    */
-  public function add() {
-		$xmlsrc = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>
-				<product>
-				    <title>pickelBacke</title>
-				    <body>This is the description.</body>
-				    <product-type>Photoshop</product-type>
-				    <variants type="array">
-				        <variant>
-				            <price>99898.00</price>
-				            <option1>Single-Use</option1>
-				        </variant>
-				        <variant>
-				            <price>9898.00</price>
-				            <option1>Buyout</option1>
-				        </variant>
-				    </variants>
-				    <vendor>fokkerone</vendor>
-				</product>';
-   	$products = $this->Product->create( $xmlsrc );
+  public function add( $xml ) {	
+	 $products = $this->Article->create( $xml );
   }
 
   /**
    * Demo action for displaying the click information for a given Shopify hash
    */
 	public function view( $id ) {
-    	$product = $this->Product->find('list', array("id" => $id));
+    	$product = $this->Article->find('list', array("id" => $id));
 		$this->set(compact('product'));
 		debug ($product);
 	}

@@ -40,6 +40,7 @@ class ShopifySource extends DataSource {
     $this->Http = $Http;
   }
 
+
   	/**
    	* Sets method = POST in request if not already set
    	*
@@ -50,10 +51,11 @@ class ShopifySource extends DataSource {
 	public function create( &$model, $path ) {
 		
 		$model->request['method'] = 'POST';
-		$model->request['header']['Content-Type'] 	= "application/xml";	
-		
-	 	return $this->apiCall( $model, $path );
+		$model->request['header']['Content-Type'] 	= "application/xml";		
+	 	return $this->postCall( $model, $path );
 	}
+
+
 
   /**
    * Sets method = GET in request if not already set
@@ -62,9 +64,12 @@ class ShopifySource extends DataSource {
    * @param array $queryData Unused
    */
 	public function read(&$model, $queryData = array()) {
+
 	  	$model->request = array_merge(array('method' => 'GET'), $model->request);
 	  	return $this->request($model);
 	}
+
+
 
   /**
    * Sets method = PUT in request if not already set
@@ -90,25 +95,22 @@ class ShopifySource extends DataSource {
 	public function delete(&$model, $path) {
 
 		
-		$model->request['method'] = 'DELETE';
-		
-		$this->getRequestHost( $model );
-		$this->	getAuth( $model );
+		$model->request['method'] = 'DELETE';		
+		$this->getApiRestpoint( $model );
+		$this->getAuth( $model );
 	  
 
 		$model->request['header']['Content-Type'] 	= "application/xml";
-		$model->request['uri']['path'] 				= $path;	 
+		$model->request['uri']['path'] 					= $path;	 
 		
 		$url = "http://" . 	$model->request['uri']['host'] . $path;
-		debug ( $url );
+		
 		$result = $this->Http->request( $model->request );
 		
 		return $result;
   	}
 
-	// public function please_build_Request_Url(){
-	// 		return $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];
-	// 	}
+	
 
   /**
    * Issues request and returns response as an array decoded according to the
@@ -120,116 +122,108 @@ class ShopifySource extends DataSource {
    * URI.
    * @return mixed The response or false
    */
-  public function request(&$model) {
-	
-	if (!isset($model->request['uri']['host'])) {
-		$model->request['uri']['host'] = $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];
-    }
+	public function request(&$model) {
+		
+		$this->getApiRestpoint ( $model );
+		$this->getAuth( $model );
 
-    if (!isset($model->request['uri']['query']['login'])) {
-		$model->request['uri']['query']['login'] = $this->config['login'];
-    }
-
-    if (!isset($model->request['uri']['query']['apiKey'])) {
-		$model->request['uri']['query']['apiKey'] = $this->config['apiKey'];
-    }
-
-    if (is_object($model)) {
-		$request = $model->request;
-    } elseif (is_array($model)) {
-		$request = $model;
-    } elseif (is_string($model)) {
-		$request = array('uri' => $model);
-    }
-
-    // Remove unwanted elements from request array
-    $request = array_intersect_key($request, $this->Http->request);
-
-    // Issues request
-	$response = $this->Http->request($request);
-	
-	
-    // Get content type header
-    $contentType = $this->Http->response['header']['Content-Type'];
-   
-    // Extract content type from content type header
-    if (preg_match('/^([a-z0-9\/\+]+);\s*charset=([a-z0-9\-]+)/i', $contentType, $matches)) {
-      $contentType = $matches[1];
-      $charset = $matches[2];
-    }
-    // Decode response according to content type
-    switch ($contentType) {
-    	case 'application/xml':
-    	case 'application/atom+xml':
-    	case 'application/rss+xml':
-        // If making multiple requests that return xml, I found that using the
-        // same Xml object with Xml::load() to load new responses did not work,
-        // consequently it is necessary to create a whole new instance of the
-        // Xml class. This can use a lot of memory so we have to manually
-        // garbage collect the Xml object when we've finished with it, i.e. got
-        // it to transform the xml string response into a php array.
-		App::import('Core', 'Xml');
-      	$Xml = new Xml($response);
-      	$response = $Xml->toArray(false); // Send false to get separate elements
-        $Xml->__destruct();
-        $Xml = null;
-        unset($Xml);
-      	break;
-      case 'application/json':
-      case 'text/javascript':
-        $response = json_decode($response, true);
-        break;
-    }
-
-    if (is_object($model)) {
-      $model->response = $response;
-    }
-
-    // Check response status code for success or failure
-    if (substr($this->Http->response['status']['code'], 0, 1) != 2) {
-      if (is_object($model) && method_exists($model, 'onError')) {
-        $model->onError();
-      }
-      return false;
-    }
-
-    return $response;
-  }
+		if (is_object($model)) {
+			$request = $model->request;
+		
+		} elseif (is_array($model)) {
+			$request = $model;
+		
+		} elseif (is_string($model)) {
+			$request = array('uri' => $model);
+		}
+		
+		return $this->checkResponse( $this->Http->request( array_intersect_key($request, $this->Http->request) ) );
+		}
 
 
 	/** 
-	* PRIVATE fucntions
+	* PRIVATE functions 
+	* do not edit down here hombre
 	**/
-	private function getRequestHost( &$model ){
-		$model->request['uri']['host'] = $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];	
+	private function getApiRestpoint( &$model ){	
+		if (!isset($model->request['uri']['host'])) {
+			$model->request['uri']['host'] = $this->getURL();
+		}		
 	}
 	
-	private function getAuth( &$model ){
-		$model->request['uri']['query']['login'] 	= $this->config['login'];
-	    $model->request['uri']['query']['apiKey'] 	= $this->config['apiKey'];
+	private function getURL( ){		
+		return $this->config['apiKey']. ':' . $this->config['login'] . '@' . $this->config['host'];
 	}
 	
+	private function getAuth( &$model ){		
+		 if (!isset($model->request['uri']['query']['login'])) {
+			$model->request['uri']['query']['login'] = $this->config['login'];
+	    }
+
+	    if (!isset($model->request['uri']['query']['apiKey'])) {
+			$model->request['uri']['query']['apiKey'] = $this->config['apiKey'];
+	    }
+	}
+	
+	
+	/**
+	* render REST API response to cakelike dataset Array 
+	**/
 	private function renderXml2Array( $response ) {
 		App::import('Core', 'Xml');
-      	$Xml = new Xml($response);
-      	$response = $Xml->toArray(false); // Send false to get separate elements
-        $Xml->__destruct();
-        $Xml = null;
-        unset($Xml);
-		return $response;
+      $Xml = new Xml($response);
+      $response = $Xml->toArray(false); // Send false to get separate elements
+      $Xml->__destruct();
+      $Xml = null;
+      unset($Xml);
+		return $response;		
 	}
 	
-	private function apiCall( &$model, $path ){
-	
-		$this->getRequestHost( $model );
+	/**
+	* call API via Post
+	* @todo: clear this 
+	**/
+	private function postCall( &$model, $path ){
+		$this->getApiRestpoint( $model );
 		$this->getAuth( $model );
-		$model->request['uri']['path'] 	= $path;
-		
-		$url 							= "http://" . 	$model->request['uri']['host'] . $path;
-		
+		$model->request['uri']['path'] = $path;		
+		$url = $this->getURL() . $path;		
 		$response =  $this->Http->post($url, $model->data, $model->request );
-			pr( $this->Http->request );
-		return $this->renderXml2Array( $response );
+		return $this->renderXml2Array( $this->checkResponse ($response));
 	}
+	
+	/**
+	* check Response on Response Status, Content-type and return the parsed api response
+	**/
+	private function checkResponse( $response ){
+		// Get content type header
+		
+		// Check response status code for success or failure
+		if (substr($this->Http->response['status']['code'], 0, 1) != 2) {
+			return false;
+		}
+		
+		$contentType = $this->Http->response['header']['Content-Type'];
+		
+		// Extract content type from content type header
+		if (preg_match('/^([a-z0-9\/\+]+);\s*charset=([a-z0-9\-]+)/i', $contentType, $matches)) {
+			$contentType = $matches[1];
+			$charset = $matches[2];
+		}
+		// Decode response according to content type
+		switch ($contentType) {
+			case 'application/xml':
+			case 'application/atom+xml':
+			case 'application/rss+xml':
+				$response = $this->renderXml2Array( $response );
+				break;
+			case 'application/json':	
+			case 'text/javascript':
+				$response = json_decode($response, true);
+				break;
+		}		
+			return $response;
+	}
+	
 }//end Class
 ?>

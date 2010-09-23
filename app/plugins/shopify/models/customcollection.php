@@ -7,14 +7,14 @@
  * @copyright (c) 2010 fokkerone
  * @license MIT License - http://www.opensource.org/licenses/mit-license.php
  */
-class Product extends ShopifyAppModel {
+class CustomCollection extends ShopifyAppModel {
 
   /**
    * Name of the model
    * 
    * @var string
    */
-  	public $name ='Product';
+  	public $name ='CustomCollection';
 
   /**
    * Model schema
@@ -68,7 +68,15 @@ class Product extends ShopifyAppModel {
 	public function _findCount($state, $query = array(), $results = array()) {
 		if ($state == 'before') {   
 			$this->setQueryParams( $query );
-			$this->request['uri']['path'] = '/admin/products/count.xml';
+			//$this->request['uri']['query']['published_status'] = isset($query["published_status"]) 	? $query["published_status"] : "any";
+			
+			if( isset ($query['id']) ) {
+				$id = $query['id'] ;
+				$url = "/admin/custom_collections/count.xml?product_id=" . $id;
+			} else {
+			 	$url = "/admin/custom_collections/count.xml";
+			}
+			$this->request['uri']['path'] = $url;
       	return $query;
 		} else {
 			return $this->renderAsXML( $results );
@@ -94,20 +102,20 @@ class Product extends ShopifyAppModel {
 	**/
 	public function _findList($state, $query = array(), $results = array()) {
 		if ($state == 'before') { 
-			$url = "/admin/products";
+			
 			if( isset ($query['id']) ) {
 				$id = $query['id'] ;
-				$url .= "/{$id}.xml";
+				$url = "/admin/custom_collections.xml?product_id=" . $id;
 			} else {
-				$url .= ".xml";
+			 	$url = "/admin/custom_collections.xml";
 			}
+			$this->request['uri']['path'] = $url;
+					
 			
 			$this->request['uri']['query']['limit'] = isset($query["limit"]) 	? $query["limit"] : 50;
-			$this->request['uri']['query']['page'] = isset($query["page"]) 	? $query["limit"] : 1 ;
-			
+			$this->request['uri']['query']['page'] = isset($query["page"]) 	? $query["limit"] : 1 ;	
 			$this->setQueryParams( $query );
-			
-			 
+				 
 			$this->request['uri']['path'] = $url;
 			return $query;
 		} else {
@@ -139,13 +147,10 @@ class Product extends ShopifyAppModel {
 	
 	
 	private function setQueryParams( $query = array( ) ){
-		if (isset ($query["vendor"]) ) 			$this->request['uri']['query']['vendor']  			= $query["vendor"];
-		if (isset ($query["product_type"]) ) 	$this->request['uri']['query']['product_type']  	= $query["product_type"];
-		if (isset ($query["collection_id"]) ) 	$this->request['uri']['query']['collection_id']  = $query["collection_id"];
-		if (isset ($query['created_at_min']) ) 	$this->request['uri']['query']['created_at_min']  = $query["created_at_min"];
-		if (isset ($query['created_at_max']) ) 	$this->request['uri']['query']['created_at_max']  = $query["created_at_max"];
-		if (isset ($query['updated_at_min']) ) 	$this->request['uri']['query']['updated_at_min']  = $query["updated_at_min"];
-		if (isset ($query['updated_at_max']) ) 	$this->request['uri']['query']['updated_at_max']  = $query["updated_at_max"];
+		if (isset ($query["title"]) ) 			$this->request['uri']['query']['title']  					= $query["title"];
+		if (isset ($query["product_id"]) ) 	$this->request['uri']['query']['product_id']  				= $query["product_id"];
+		if (isset ($query["updated_at_min"]) ) 	$this->request['uri']['query']['updated_at_min']  	= $query["updated_at_min"];
+		if (isset ($query["updated_at_max"]) ) 	$this->request['uri']['query']['updated_at_max']  	= $query["updated_at_max"];
 	}
 	
 }//end Class

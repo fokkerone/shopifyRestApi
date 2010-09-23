@@ -7,14 +7,14 @@
  * @copyright (c) 2010 fokkerone
  * @license MIT License - http://www.opensource.org/licenses/mit-license.php
  */
-class Product extends ShopifyAppModel {
+class Asset extends ShopifyAppModel {
 
   /**
    * Name of the model
    * 
    * @var string
    */
-  	public $name ='Product';
+  	public $name ='Asset';
 
   /**
    * Model schema
@@ -45,35 +45,8 @@ class Product extends ShopifyAppModel {
 	*/
 	var $_findMethods = array(
 	'list' => true,
-	'count'  => true,
 	);
 
-
-	/**
-	* Receive a count of all Products
-	* Get a count of all products of a given collection
- 	* 
-	* Available URL Query parameters:
- 	* 
-	* vendor — Filter by product vendor
-	* product_type — Filter by product type
-	* collection_id — Filter by collection id
-	* created_at_min — Show products created after date (format: 2008-01-01 03:00)
-	* created_at_max — Show products created before date (format: 2008-01-01 03:00)
-	* updated_at_min — Show products last updated after date (format: 2008-01-01 03:00)
-	* updated_at_max — Show products last updated before date (format: 2008-01-01 03:00)
-	* GET /admin/products/count.xml
-	* Count all products
-	**/
-	public function _findCount($state, $query = array(), $results = array()) {
-		if ($state == 'before') {   
-			$this->setQueryParams( $query );
-			$this->request['uri']['path'] = '/admin/products/count.xml';
-      	return $query;
-		} else {
-			return $this->renderAsXML( $results );
-    }
-  }
   
 
   	/**
@@ -94,20 +67,20 @@ class Product extends ShopifyAppModel {
 	**/
 	public function _findList($state, $query = array(), $results = array()) {
 		if ($state == 'before') { 
-			$url = "/admin/products";
+			
 			if( isset ($query['id']) ) {
 				$id = $query['id'] ;
-				$url .= "/{$id}.xml";
+				$url = "/admin/blogs/{$id}/articles.xml";
 			} else {
-				$url .= ".xml";
+				return $query;
 			}
+					
 			
+			$this->request['uri']['query']['published_status'] = isset($query["published_status"]) 	? $query["published_status"] : "any";
 			$this->request['uri']['query']['limit'] = isset($query["limit"]) 	? $query["limit"] : 50;
-			$this->request['uri']['query']['page'] = isset($query["page"]) 	? $query["limit"] : 1 ;
-			
+			$this->request['uri']['query']['page'] = isset($query["page"]) 	? $query["limit"] : 1 ;	
 			$this->setQueryParams( $query );
-			
-			 
+				 
 			$this->request['uri']['path'] = $url;
 			return $query;
 		} else {
@@ -142,10 +115,10 @@ class Product extends ShopifyAppModel {
 		if (isset ($query["vendor"]) ) 			$this->request['uri']['query']['vendor']  			= $query["vendor"];
 		if (isset ($query["product_type"]) ) 	$this->request['uri']['query']['product_type']  	= $query["product_type"];
 		if (isset ($query["collection_id"]) ) 	$this->request['uri']['query']['collection_id']  = $query["collection_id"];
-		if (isset ($query['created_at_min']) ) 	$this->request['uri']['query']['created_at_min']  = $query["created_at_min"];
-		if (isset ($query['created_at_max']) ) 	$this->request['uri']['query']['created_at_max']  = $query["created_at_max"];
-		if (isset ($query['updated_at_min']) ) 	$this->request['uri']['query']['updated_at_min']  = $query["updated_at_min"];
-		if (isset ($query['updated_at_max']) ) 	$this->request['uri']['query']['updated_at_max']  = $query["updated_at_max"];
+		if (isset ($query["reated_at_min"]) ) 	$this->request['uri']['query']['reated_at_min']  = $query["created_at_min"];
+		if (isset ($query["reated_at_max"]) ) 	$this->request['uri']['query']['reated_at_max']  = $query["created_at_max"];
+		if (isset ($query["pdated_at_min"]) ) 	$this->request['uri']['query']['pdated_at_min']  = $query["cpdated_at_min"];
+		if (isset ($query["pdated_at_max"]) ) 	$this->request['uri']['query']['pdated_at_max']  = $query["cpdated_at_max"];
 	}
 	
 }//end Class

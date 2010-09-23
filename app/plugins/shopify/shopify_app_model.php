@@ -10,7 +10,7 @@ class ShopifyAppModel extends AppModel{
 	
 	var $useTable 		= false;
 	var $request 		= array();
-	var $datasource 	= null;
+	var $datasource 	= false;
 	 
 	
 	function __construct( $config ){
@@ -36,22 +36,31 @@ class ShopifyAppModel extends AppModel{
 	/**
 	* Overwrites the Model::save
 	**/
-	public function save( $path = null ) {
-		$this->request = array();
+	public function save( $path = null, $_id = null ) {
+		if ( isset ($_id) ){
+			debug ("make update" );
+			return $this->update($path, $_id );
+		}
+		
+		$this->request = array();	
+		
 		if (isset ($this->data ) ){
-			return $this->datasource->create( $this, $path );
+			return $this->renderAsXML ( $this->datasource->create( $this, $path ));
 		}else{
+			debug ("on Model Error");
 			return false;
 		}
 	}
 	
 	/**
-	* New Model::update
+	* maModel::update
 	**/
-	public function update( $data = array() ){
+	public function update( $path = null, $id = null ){
 		$this->request = array();
-		ConnectionManager::getDataSource('shopify')->update($this);	  	
-	  	
+		if (isset($this->data) && isset ($id)){
+			return $this->datasource->update( $this, $path, $id );  	
+		}
+		return false;	
 	}
 	
 	/**
@@ -62,7 +71,7 @@ class ShopifyAppModel extends AppModel{
 		if (isset  ( $this->id ) ){
 			return $this->datasource->delete( $this, $path );
 		}else{
-			debug ("sdfsdf");
+			debug ("onModel Error");
 			return false;
 		}  	  	
 	}

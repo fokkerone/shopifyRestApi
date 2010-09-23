@@ -8,7 +8,7 @@
  * @copyright (c) 2010 fokkerone
  * @license MIT License - http://www.opensource.org/licenses/mit-license.php
  */
-class ProductsController extends ShopifyAppController {
+class EventsController extends ShopifyAppController {
 
   /**
    * The name of this controller
@@ -16,7 +16,7 @@ class ProductsController extends ShopifyAppController {
    * @var string
    * @access public
    */
-	public $name = 'Products';
+	public $name = 'Events';
 
   /**
    * Demo action for showing the most recent Shopify links from your account. Note
@@ -26,10 +26,10 @@ class ProductsController extends ShopifyAppController {
    * @access public
    */
   public function index() {
-	 debug ($this->Product->find('count', array("vendor" => "fokkerone")));
-    $products = $this->Product->find('list');
- 	$this->set(compact('products'));
-	debug ($products);
+	 debug ($this->Event->find('count', array("vendor" => "fokkerone")));
+    $events = $this->Event->find('list');
+ 	$this->set(compact('events'));
+	debug ($events);
   }
 
   /**
@@ -40,10 +40,10 @@ class ProductsController extends ShopifyAppController {
    */
   public function add() {
 		$xmlsrc = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>
-				<product>
+				<event>
 				    <title>pickelBacke</title>
 				    <body>This is the description.</body>
-				    <product-type>Photoshop</product-type>
+				    <event-type>Photoshop</event-type>
 				    <variants type="array">
 				        <variant>
 				            <price>99898.00</price>
@@ -55,22 +55,22 @@ class ProductsController extends ShopifyAppController {
 				        </variant>
 				    </variants>
 				    <vendor>fokkerone</vendor>
-				</product>';
-   	$products = $this->Product->create( $xmlsrc );
+				</event>';
+   	$events = $this->Event->create( $xmlsrc );
   }
 
   /**
    * Demo action for displaying the click information for a given Shopify hash
    */
 	public function view( $id ) {
-    	$product = $this->Product->find('list', array("id" => $id));
-		$this->set(compact('product'));
-		debug ($product);
+    	$event = $this->Event->find('list', array("id" => $id));
+		$this->set(compact('event'));
+		debug ($event);
 	}
 	
 
 	public function delete( $id ){
-		$product = $this->Product->deleteProduct( $id );	
+		$event = $this->Event->deleteEvent( $id );	
 	}
 
 }
