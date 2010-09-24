@@ -26,7 +26,7 @@ class MetafieldsController extends ShopifyAppController {
    * @access public
    */
 	public function index() {
-	 	debug ($this->Metafield->find('count', array("vendor" => "fokkerone")));
+	 	//debug ($this->Metafield->find('count', array("vendor" => "fokkerone")));
     	$Metafields = $this->Metafield->find('list');
  		$this->set(compact('$Metafields'));
 		debug ($Metafields);
@@ -42,9 +42,13 @@ class MetafieldsController extends ShopifyAppController {
 	
 		$xml = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>
 				<metafield>
-				  <namespace>inventory</namespace>
-				  <value type="integer">25</value>
+				  <created-at type="datetime">2010-09-01T08:57:29-04:00</created-at>
+				  <description nil="true">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
+				  <id type="integer">909327677</id>
 				  <key>warehouse</key>
+				  <namespace>inventory</namespace>
+				  <updated-at type="datetime">2010-09-01T08:57:29-04:00</updated-at>
+				  <value>25</value>
 				  <value-type>integer</value-type>
 				</metafield>';
 	
@@ -63,7 +67,8 @@ class MetafieldsController extends ShopifyAppController {
 	
 
 	public function delete( $id ){
-		$metafield = $this->Product->deleteProduct( $id );	
+		$m = $this->Metafield->delete( $id );
+		debug ($m);	
 	}
 
 }

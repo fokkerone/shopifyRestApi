@@ -63,7 +63,7 @@ class CustomcollectionsController extends ShopifyAppController {
 	
 
 	public function delete( $id ){
-		$customcollection = $this->Product->deleteProduct( $id );	
+		$customcollection = $this->Product->delete( $id );	
 	}
 
 }

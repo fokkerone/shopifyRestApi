@@ -45,7 +45,6 @@ class Metafield extends ShopifyAppModel {
 	*/
 	var $_findMethods = array(
 	'list' => true,
-	'byid'  => true,
 	);
   
 
@@ -94,16 +93,14 @@ class Metafield extends ShopifyAppModel {
 	function create( $data = null, $validate = true, $fieldList = array() ){
 		$this->data = $data;
 	   	$response = $this->save( '/admin/metafields.xml' );
-		debug ($response);
 		return $response;		
 	}
 	
 	
-	function deleteMetafield( $id ){
+	function delete( $id ){
 
 		$this->id = $id;
-	   	$response = $this->delete( "/admin/Metafields/{$id}.xml" );
-		debug ($response);
+	   	$response = parent::delete( "/admin/metafields/{$id}.xml" );
 		return $response;		
 	}
 	
